@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RepurposeQuest AI - Drug Repurposing Research Assistant</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="logo">
+                <i class="fas fa-pills"></i>
+                <h1>RepurposeQuest AI</h1>
+            </div>
+            <div class="subtitle">Advanced Drug Repurposing Research Assistant</div>
+        </header>
+
+        <main class="main-content">
+            <section class="input-section">
+                <div class="input-container">
+                    <h2>Research Query</h2>
+                    <div class="query-form">
+                        <div class="form-group">
+                            <label for="molecule">Molecule Name</label>
+                            <input type="text" id="molecule" placeholder="e.g., Molecule X" value="Molecule X">
+                        </div>
+                        <div class="form-group">
+                            <label for="target">Target Pathway</label>
+                            <input type="text" id="target" placeholder="e.g., JAK/STAT pathway" value="JAK/STAT pathway">
+                        </div>
+                        <button id="analyze-btn" class="analyze-btn">
+                            <i class="fas fa-search"></i>
+                            Analyze Repurposing Opportunities
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="results-section" id="results" style="display: none;">
+                <div class="results-header">
+                    <h2>Research Summary</h2>
+                    <div class="timestamp" id="timestamp"></div>
+                </div>
+
+                <div class="task-completion">
+                    <h3>Task Completion Checklist</h3>
+                    <div class="checklist">
+                        <div class="checklist-item">
+                            <i class="fas fa-check-circle completed"></i>
+                            <span>Literature review completed</span>
+                        </div>
+                        <div class="checklist-item">
+                            <i class="fas fa-check-circle completed"></i>
+                            <span>Clinical trials analysis</span>
+                        </div>
+                        <div class="checklist-item">
+                            <i class="fas fa-check-circle completed"></i>
+                            <span>Patent landscape assessment</span>
+                        </div>
+                        <div class="checklist-item">
+                            <i class="fas fa-check-circle completed"></i>
+                            <span>Opportunity identification</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="literature-review">
+                    <h3>Literature Review</h3>
+                    <div class="metric">
+                        <span class="metric-value" id="paper-count">247</span>
+                        <span class="metric-label">peer-reviewed papers analyzed</span>
+                    </div>
+                    <div class="literature-highlights">
+                        <div class="highlight-item">
+                            <i class="fas fa-flask"></i>
+                            <span>Strong mechanistic evidence for JAK/STAT modulation</span>
+                        </div>
+                        <div class="highlight-item">
+                            <i class="fas fa-dna"></i>
+                            <span>Preclinical data shows efficacy in inflammatory models</span>
+                        </div>
+                        <div class="highlight-item">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Favorable safety profile in existing indications</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="clinical-trials">
+                    <h3>Active Clinical Trials</h3>
+                    <div class="metric">
+                        <span class="metric-value" id="trial-count">12</span>
+                        <span class="metric-label">active trials identified</span>
+                    </div>
+                    <div class="trial-phases">
+                        <div class="phase-item">
+                            <span class="phase-label">Phase I</span>
+                            <span class="phase-count">3</span>
+                        </div>
+                        <div class="phase-item">
+                            <span class="phase-label">Phase II</span>
+                            <span class="phase-count">7</span>
+                        </div>
+                        <div class="phase-item">
+                            <span class="phase-label">Phase III</span>
+                            <span class="phase-count">2</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="patent-analysis">
+                    <h3>Patent Landscape Analysis</h3>
+                    <div class="patent-summary">
+                        <div class="patent-item expired">
+                            <i class="fas fa-unlock"></i>
+                            <div>
+                                <strong>Expired Patents:</strong> 8
+                                <span class="patent-detail">Core composition patents expired 2020-2023</span>
+                            </div>
+                        </div>
+                        <div class="patent-item overlapping">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <div>
+                                <strong>Overlapping Patents:</strong> 15
+                                <span class="patent-detail">Method-of-use patents in related therapeutic areas</span>
+                            </div>
+                        </div>
+                        <div class="patent-item opportunity">
+                            <i class="fas fa-lightbulb"></i>
+                            <div>
+                                <strong>White Space:</strong> 3 disease areas with minimal patent coverage</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="opportunities">
+                    <h3>Potential Opportunities</h3>
+                    <div class="opportunity-list">
+                        <div class="opportunity-item">
+                            <div class="opportunity-header">
+                                <h4>Rheumatoid Arthritis</h4>
+                                <div class="confidence-score">
+                                    <span class="score-label">Confidence:</span>
+                                    <div class="score-bar">
+                                        <div class="score-fill" style="width: 85%"></div>
+                                    </div>
+                                    <span class="score-value">0.85</span>
+                                </div>
+                            </div>
+                            <div class="opportunity-details">
+                                <p>Strong JAK/STAT pathway involvement in RA pathogenesis. Existing safety data supports rapid clinical development.</p>
+                                <div class="opportunity-tags">
+                                    <span class="tag">High Priority</span>
+                                    <span class="tag">Fast Track Potential</span>
+                                    <span class="tag">Large Market</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="opportunity-item">
+                            <div class="opportunity-header">
+                                <h4>Inflammatory Bowel Disease</h4>
+                                <div class="confidence-score">
+                                    <span class="score-label">Confidence:</span>
+                                    <div class="score-bar">
+                                        <div class="score-fill" style="width: 78%"></div>
+                                    </div>
+                                    <span class="score-value">0.78</span>
+                                </div>
+                            </div>
+                            <div class="opportunity-details">
+                                <p>JAK/STAT signaling critical in intestinal inflammation. Preclinical models demonstrate efficacy in colitis.</p>
+                                <div class="opportunity-tags">
+                                    <span class="tag">Medium Priority</span>
+                                    <span class="tag">Orphan Drug Potential</span>
+                                    <span class="tag">Unmet Need</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="opportunity-item">
+                            <div class="opportunity-header">
+                                <h4>Multiple Sclerosis</h4>
+                                <div class="confidence-score">
+                                    <span class="score-label">Confidence:</span>
+                                    <div class="score-bar">
+                                        <div class="score-fill" style="width: 72%"></div>
+                                    </div>
+                                    <span class="score-value">0.72</span>
+                                </div>
+                            </div>
+                            <div class="opportunity-details">
+                                <p>Emerging evidence of JAK/STAT role in neuroinflammation and demyelination. Novel mechanism for MS treatment.</p>
+                                <div class="opportunity-tags">
+                                    <span class="tag">Innovative</span>
+                                    <span class="tag">High Risk/Reward</span>
+                                    <span class="tag">Patent Opportunity</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button class="action-btn primary" id="export-btn">
+                        <i class="fas fa-download"></i>
+                        Export Report
+                    </button>
+                    <button class="action-btn graph-btn" id="graph-btn">
+                        <i class="fas fa-project-diagram"></i>
+                        View Graph
+                    </button>
+                    <button class="action-btn xai-btn" id="xai-btn">
+                        <i class="fas fa-brain"></i>
+                        AI (XAI)
+                    </button>
+                    <button class="action-btn heatmap-btn" id="heatmap-btn">
+                        <i class="fas fa-th"></i>
+                        Heatmap
+                    </button>
+                    <button class="action-btn secondary" id="new-analysis-btn">
+                        <i class="fas fa-redo"></i>
+                        New Analysis
+                    </button>
+                </div>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <div class="footer-content">
+                <p>&copy; 2024 RepurposeQuest AI. Advanced drug repurposing research assistant.</p>
+                <div class="footer-links">
+                    <a href="#" class="footer-link">API Documentation</a>
+                    <a href="#" class="footer-link">Research Methodology</a>
+                    <a href="#" class="footer-link">Contact</a>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <div class="loading-overlay" id="loading">
+        <div class="loading-spinner">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Analyzing repurposing opportunities...</p>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

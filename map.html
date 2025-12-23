@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RepurposeQuest AI - Molecular Impact Heatmap</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+            color: #ffffff;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        header {
+            background: rgba(15, 23, 42, 0.95);
+            padding: 20px 30px;
+            border-bottom: 2px solid rgba(255, 107, 107, 0.3);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo i {
+            font-size: 2rem;
+            color: #ff6b6b;
+        }
+
+        .logo h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #ff6b6b;
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            color: #64748b;
+            margin-top: 5px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .control-btn {
+            background: rgba(255, 107, 107, 0.1);
+            border: 1px solid #ff6b6b;
+            color: #ff6b6b;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 107, 107, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .back-btn {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: #ef4444;
+            color: #ef4444;
+        }
+
+        .back-btn:hover {
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        main {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .heatmap-container {
+            flex: 1;
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            position: relative;
+        }
+
+        .heatmap-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #ff6b6b;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        #heatmap-svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .heatmap-cell {
+            cursor: pointer;
+            transition: all 0.3s ease;
+            stroke: #1e293b;
+            stroke-width: 1px;
+        }
+
+        .heatmap-cell:hover {
+            stroke: #ff6b6b;
+            stroke-width: 2px;
+            filter: brightness(1.2);
+        }
+
+        .heatmap-cell.highlighted {
+            stroke: #00d4ff;
+            stroke-width: 3px;
+            filter: brightness(1.3);
+        }
+
+        .axis-label {
+            font-size: 0.85rem;
+            font-weight: 500;
+            fill: #e2e8f0;
+            text-anchor: middle;
+        }
+
+        .axis-label.row {
+            text-anchor: end;
+        }
+
+        .axis-label.col {
+            text-anchor: middle;
+        }
+
+        .crosstalk-overlay {
+            position: absolute;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .crosstalk-overlay.active {
+            opacity: 1;
+        }
+
+        .tooltip {
+            position: absolute;
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid #ff6b6b;
+            border-radius: 8px;
+            padding: 15px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            z-index: 1001;
+            max-width: 300px;
+        }
+
+        .tooltip.show {
+            opacity: 1;
+        }
+
+        .tooltip h3 {
+            color: #ff6b6b;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .tooltip p {
+            margin: 5px 0;
+            font-size: 0.9rem;
+            color: #94a3b8;
+        }
+
+        .tooltip .impact-score {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .tooltip .score-bar {
+            width: 100px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .tooltip .score-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff6b6b, #ee5a24);
+            transition: width 0.3s ease;
+        }
+
+        .filters-panel {
+            width: 280px;
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .filters-panel h3 {
+            color: #ff6b6b;
+            margin-bottom: 15px;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .filter-section {
+            margin-bottom: 20px;
+        }
+
+        .filter-section h4 {
+            color: #e2e8f0;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .filter-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 8px 0;
+            font-size: 0.8rem;
+        }
+
+        .filter-item input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: #ff6b6b;
+        }
+
+        .filter-item label {
+            color: #94a3b8;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .legend {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .legend h3 {
+            color: #ff6b6b;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 5px 0;
+            font-size: 0.8rem;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 12px;
+            border-radius: 2px;
+        }
+
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: #ff6b6b;
+        }
+
+        .loading i {
+            font-size: 3rem;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .info-panel {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid #ff6b6b;
+            border-radius: 8px;
+            padding: 15px;
+            backdrop-filter: blur(10px);
+            max-width: 250px;
+        }
+
+        .info-panel h3 {
+            color: #ff6b6b;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .info-panel p {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            line-height: 1.4;
+        }
+
+        .crosstalk-indicator {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid #00d4ff;
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 0.75rem;
+            color: #00d4ff;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .crosstalk-indicator.active {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-th"></i>
+                    <div>
+                        <h1>Molecular Impact Heatmap</h1>
+                        <div class="subtitle">JAK/STAT Pathway Modulation Analysis</div>
+                    </div>
+                </div>
+                <div class="controls">
+                    <button class="control-btn back-btn" id="back-btn">
+                        <i class="fas fa-arrow-left"></i> Back to Analysis
+                    </button>
+                    <button class="control-btn" id="reset-btn">
+                        <i class="fas fa-redo"></i> Reset View
+                    </button>
+                    <button class="control-btn" id="crosstalk-btn">
+                        <i class="fas fa-project-diagram"></i> Toggle Crosstalk
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <div class="heatmap-container">
+                <div class="heatmap-title">Molecule X Pathway Impact Across Disease Indications</div>
+                <div class="crosstalk-indicator" id="crosstalk-indicator">
+                    <i class="fas fa-link"></i> Crosstalk Active
+                </div>
+                <svg id="heatmap-svg"></svg>
+                <div class="tooltip" id="tooltip"></div>
+                
+                <div class="legend">
+                    <h3>Impact Strength</h3>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #dc2626;"></div>
+                        <span>Strong Positive (>0.7)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #f97316;"></div>
+                        <span>Moderate Positive (0.3-0.7)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #64748b;"></div>
+                        <span>Neutral (-0.3 to 0.3)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #3b82f6;"></div>
+                        <span>Moderate Negative (-0.7 to -0.3)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #1e40af;"></div>
+                        <span>Strong Negative (<-0.7)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="filters-panel">
+                <h3>Filters & Options</h3>
+                
+                <div class="filter-section">
+                    <h4>Pathway Components</h4>
+                    <div class="filter-item">
+                        <input type="checkbox" id="jak-filter" checked>
+                        <label for="jak-filter">JAK Family</label>
+                    </div>
+                    <div class="filter-item">
+                        <input type="checkbox" id="stat-filter" checked>
+                        <label for="stat-filter">STAT Family</label>
+                    </div>
+                </div>
+
+                <div class="filter-section">
+                    <h4>Disease Indications</h4>
+                    <div class="filter-item">
+                        <input type="checkbox" id="ra-filter" checked>
+                        <label for="ra-filter">Rheumatoid Arthritis</label>
+                    </div>
+                    <div class="filter-item">
+                        <input type="checkbox" id="vitiligo-filter" checked>
+                        <label for="vitiligo-filter">Vitiligo</label>
+                    </div>
+                    <div class="filter-item">
+                        <input type="checkbox" id="uc-filter" checked>
+                        <label for="uc-filter">Ulcerative Colitis</label>
+                    </div>
+                </div>
+
+                <div class="filter-section">
+                    <h4>Display Options</h4>
+                    <div class="filter-item">
+                        <input type="checkbox" id="show-values" checked>
+                        <label for="show-values">Show Values</label>
+                    </div>
+                    <div class="filter-item">
+                        <input type="checkbox" id="show-evidence" checked>
+                        <label for="show-evidence">Evidence Summary</label>
+                    </div>
+                </div>
+
+                <div class="info-panel">
+                    <h3>Interactive Features</h3>
+                    <p>• Hover cells for detailed impact scores</p>
+                    <p>• Click to highlight pathway connections</p>
+                    <p>• Toggle crosstalk for multi-component analysis</p>
+                    <p>• Filter by components or diseases</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="map.js"></script>
+</body>
+</html>

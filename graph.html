@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RepurposeQuest AI - Network Visualization</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: #ffffff;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        header {
+            background: rgba(26, 26, 46, 0.95);
+            padding: 20px 30px;
+            border-bottom: 2px solid rgba(74, 144, 226, 0.3);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo i {
+            font-size: 2rem;
+            color: #4a90e2;
+        }
+
+        .logo h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #4a90e2;
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            color: #8b9dc3;
+            margin-top: 5px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .control-btn {
+            background: rgba(74, 144, 226, 0.2);
+            border: 1px solid #4a90e2;
+            color: #4a90e2;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .control-btn:hover {
+            background: rgba(74, 144, 226, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .back-btn {
+            background: rgba(231, 76, 60, 0.2);
+            border-color: #e74c3c;
+            color: #e74c3c;
+        }
+
+        .back-btn:hover {
+            background: rgba(231, 76, 60, 0.3);
+            border-color: #e74c3c;
+        }
+
+        main {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #graph-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .node {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .node.molecule {
+            fill: #4a90e2;
+            stroke: #357abd;
+            stroke-width: 3px;
+        }
+
+        .node.pathway {
+            fill: #9b59b6;
+            stroke: #8e44ad;
+            stroke-width: 2px;
+        }
+
+        .node.disease {
+            fill: #e74c3c;
+            stroke: #c0392b;
+            stroke-width: 2px;
+        }
+
+        .node.highlighted {
+            filter: drop-shadow(0 0 20px rgba(74, 144, 226, 0.8));
+            transform: scale(1.1);
+        }
+
+        .node:hover {
+            filter: drop-shadow(0 0 15px rgba(74, 144, 226, 0.6));
+        }
+
+        .edge {
+            stroke-opacity: 0.6;
+            transition: all 0.3s ease;
+        }
+
+        .edge.strong {
+            stroke: #27ae60;
+            stroke-width: 4px;
+        }
+
+        .edge.moderate {
+            stroke: #f39c12;
+            stroke-width: 2px;
+        }
+
+        .edge.weak {
+            stroke: #95a5a6;
+            stroke-width: 1px;
+        }
+
+        .edge.highlighted {
+            stroke-opacity: 1;
+            stroke-width: 6px;
+            filter: drop-shadow(0 0 10px rgba(74, 144, 226, 0.8));
+        }
+
+        .node-label {
+            font-size: 12px;
+            font-weight: 500;
+            fill: #ffffff;
+            text-anchor: middle;
+            pointer-events: none;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+        }
+
+        .tooltip {
+            position: absolute;
+            background: rgba(26, 26, 46, 0.95);
+            border: 1px solid #4a90e2;
+            border-radius: 8px;
+            padding: 15px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            z-index: 1001;
+            max-width: 300px;
+        }
+
+        .tooltip.show {
+            opacity: 1;
+        }
+
+        .tooltip h3 {
+            color: #4a90e2;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .tooltip p {
+            margin: 5px 0;
+            font-size: 0.9rem;
+            color: #8b9dc3;
+        }
+
+        .tooltip .evidence-score {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .tooltip .score-bar {
+            width: 100px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .tooltip .score-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #27ae60, #2ecc71);
+            transition: width 0.3s ease;
+        }
+
+        .legend {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(26, 26, 46, 0.95);
+            border: 1px solid #4a90e2;
+            border-radius: 8px;
+            padding: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .legend h3 {
+            color: #4a90e2;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 5px 0;
+            font-size: 0.8rem;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: #4a90e2;
+        }
+
+        .loading i {
+            font-size: 3rem;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .info-panel {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(26, 26, 46, 0.95);
+            border: 1px solid #4a90e2;
+            border-radius: 8px;
+            padding: 15px;
+            backdrop-filter: blur(10px);
+            max-width: 250px;
+        }
+
+        .info-panel h3 {
+            color: #4a90e2;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .info-panel p {
+            font-size: 0.8rem;
+            color: #8b9dc3;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-project-diagram"></i>
+                    <div>
+                        <h1>Network Visualization</h1>
+                        <div class="subtitle">AI-Powered Biomedical Discovery Graph</div>
+                    </div>
+                </div>
+                <div class="controls">
+                    <button class="control-btn back-btn" id="back-btn">
+                        <i class="fas fa-arrow-left"></i> Back to Analysis
+                    </button>
+                    <button class="control-btn" id="reset-btn">
+                        <i class="fas fa-redo"></i> Reset View
+                    </button>
+                    <button class="control-btn" id="zoom-in-btn">
+                        <i class="fas fa-search-plus"></i> Zoom In
+                    </button>
+                    <button class="control-btn" id="zoom-out-btn">
+                        <i class="fas fa-search-minus"></i> Zoom Out
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <div id="graph-container">
+                <div class="loading" id="loading">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Loading network visualization...</p>
+                </div>
+                <svg id="graph"></svg>
+            </div>
+
+            <div class="tooltip" id="tooltip"></div>
+
+            <div class="legend">
+                <h3>Node Types</h3>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #4a90e2;"></div>
+                    <span>Molecule</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #9b59b6;"></div>
+                    <span>Pathway</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #e74c3c;"></div>
+                    <span>Disease</span>
+                </div>
+                <h3 style="margin-top: 15px;">Evidence Strength</h3>
+                <div class="legend-item">
+                    <div style="width: 30px; height: 4px; background: #27ae60;"></div>
+                    <span>Strong</span>
+                </div>
+                <div class="legend-item">
+                    <div style="width: 30px; height: 2px; background: #f39c12;"></div>
+                    <span>Moderate</span>
+                </div>
+                <div class="legend-item">
+                    <div style="width: 30px; height: 1px; background: #95a5a6;"></div>
+                    <span>Weak</span>
+                </div>
+            </div>
+
+            <div class="info-panel">
+                <h3>Interactive Features</h3>
+                <p>• Hover over nodes for detailed information</p>
+                <p>• Click disease nodes to highlight connections</p>
+                <p>• Use zoom controls to explore the network</p>
+                <p>• Drag nodes to reposition the layout</p>
+            </div>
+        </main>
+    </div>
+
+    <script src="graph.js"></script>
+</body>
+</html>
