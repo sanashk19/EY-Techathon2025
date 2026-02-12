@@ -1,0 +1,16 @@
+[
+  {
+    "source_type": "PubMed",
+    "source_id": "PMID:31645678",
+    "content": "Terazosin activates Pgk1 and Hsp90 to promote stress resistance. In ALS models, it was shown to slow neurodegeneration by enhancing glycolysis.",
+    "url": "https://pubmed.ncbi.nlm.nih.gov/31645678/",
+    "confidence_score": 0.88
+  },
+  {
+    "source_type": "PubMed",
+    "source_id": "PMID:29345611",
+    "content": "A study on alpha-1 adrenergic blockers suggests a potential neuroprotective role in motor neuron diseases via metabolic pathways.",
+    "url": "https://pubmed.ncbi.nlm.nih.gov/29345611/",
+    "confidence_score": 0.75
+  }
+]
