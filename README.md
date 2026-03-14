@@ -1,145 +1,131 @@
-RepurposeQuest AI
-An Explainable, Agentic Drug Repurposing Decision-Support System
+# 🧬 CuraNova AI
+### **From Black Box to Glass Box: The World's First AR-Enabled, Blockchain-Audited Drug Repurposing Agent.**
 
-📌 Overview
-RepurposeQuest AI is an agentic, explainable AI platform designed to assist pharmaceutical researchers in identifying, validating, and prioritizing new therapeutic indications for existing drugs. Unlike traditional drug repurposing tools that rely on opaque prediction scores or static reports, RepurposeQuest AI integrates biological reasoning, multi-source evidence, and transparent explainability into a single decision-support workflow.
+![Python](https://img.shields.io/badge/Python-3.10%2B-blue) ![FastAPI](https://img.shields.io/badge/FastAPI-0.95-teal) ![Frontend](https://img.shields.io/badge/Frontend-Vanilla_JS-yellow) ![D3.js](https://img.shields.io/badge/Data_Viz-D3.js-orange) ![WebXR](https://img.shields.io/badge/AR-Google_Model__Viewer-purple)
 
-The system combines multi-agent orchestration, mechanism-first pathway analysis, and graph-based ranking to help scientists understand why a drug may work for a new disease, how evidence supports it, and how confident the recommendation is.
+---
 
-🎯 Problem Statement
-Drug repurposing remains a manual, time-consuming, and fragmented process. Researchers must independently analyze scientific literature, clinical trials, patent landscapes, and biological pathways. Existing AI tools often provide black-box predictions without explainability or biological validation, resulting in low trust and limited real-world adoption.
-RepurposeQuest AI addresses this gap by transforming drug repurposing into an explainable, biology-driven decision-making process.
+## 🚨 The Problem: The "Trust Gap" in Pharma AI
+Drug repurposing is the fastest way to bring treatments to market, but traditional AI tools fail to gain researcher trust due to three fatal flaws:
+1. **"Black Box" Answers:** AI predicts a drug but can't explain *why*, leading to zero clinical trust.
+2. **Business Blindness:** AI suggests drugs that are biologically sound but commercially unviable (e.g., highly toxic or under strict competitor patents).
+3. **The Audit Void:** No immutable proof of discovery exists for FDA audits or IP filings.
 
-🧩 Key Features
-Agentic AI Orchestration using a Master Agent and specialized worker agents
-Explainable Evidence Flow tracing recommendations to literature, trials, and patents
-Mechanism-First Reasoning via pathway and MoA analysis
-Graph Neural Network (GNN)–based ranking of drug–disease pairs
-Interactive Visualizations (graphs, heatmaps, confidence scores)
-Decision-Support Outputs, not black-box predictions
+## 💡 The Solution
+**CuraNova AI** is an explainable, agentic decision-support platform. It utilizes a LangGraph-powered "Master Agent" to orchestrate specialized sub-agents (Literature, Clinical, Patent) to find, validate, and audit drug candidates in seconds.
 
-🏗️ System Architecture (High Level)
-UI (React + D3.js)
-        ↓
-API Gateway (FastAPI)
-        ↓
-Master Agent (LangGraph)
-        ↓
-------------------------------------------------
-| Literature Agent | Clinical Trials Agent |
-| Patent Agent     | Market Agent          |
-| GNN Agent        | Mechanism Explorer    |
-------------------------------------------------
-        ↓
-Data Layer (Mock / Public / Proprietary Sources)
+---
 
-🔄 End-to-End Workflow
-Researcher inputs an existing molecule and target pathway
-Master Agent orchestrates specialized agents
-Evidence is collected from literature, trials, and patents
-Pathway-level reasoning validates biological plausibility
-Explainable reasoning evaluates evidence contributions
-GNN ranks repurposing opportunities with confidence scores
-Results are presented via interactive dashboards and reports
+## 🔥 "Unfair Advantages" (Key Differentiators)
 
-🧠 Core Agents
-🔹 Master Agent (Orchestrator)
-Coordinates the overall workflow
-Manages state, task delegation, and result aggregation
+* 🛑 **The "Negative Logic" Engine (Why Not? Panel):** Unlike standard AI that only looks for success, our system actively rejects candidates based on deterministic gates. The UI explicitly shows alternative drugs flagged for "High Toxicity" or "Active Competitor Patents."
+* 👓 **3D Immersive Validation (AR):** Built with WebXR (`<model-viewer>`), researchers can launch a 3D AR view of the molecular protein structure directly from the dashboard to physically inspect molecular docking.
+* 🎛️ **Human-in-the-Loop Live Steering:** Researchers can adjust the weight of Evidence (Literature vs. Trials vs. Patents) using live UI sliders. The overall confidence score recomputes instantly client-side without costly backend calls.
+* 🛡️ **Immutable Audit Trail:** Every AI decision and confidence score is cryptographically hashed (SHA-256) upon generation, creating a "Proof of Discovery" timestamp for patent protection.
+* 🔍 **100% Traceable "Glass Box" Graph:** An interactive D3.js Knowledge Graph where every edge click reveals the exact structured evidence (PubMed snippet, Trial ID) used to make the biological connection.
 
-🔹 Literature Agent
-Uses LLM + Retrieval-Augmented Generation (RAG)
-Extracts mechanistic and experimental insights from research papers
+---
 
-🔹 Clinical Trials Agent
-Analyzes trial phases, outcomes, and disease relevance
-Uses public or mocked ClinicalTrials data
+## 🏗️ System Architecture
 
-🔹 Patent Intelligence Agent
-Identifies overlapping, expired, and white-space patents
-Assesses IP feasibility of repurposing opportunities
+```mermaid
+graph LR
+    %% Styles
+    classDef frontend fill:#f9f9f9,stroke:#333,stroke-width:2px;
+    classDef backend fill:#e1f5fe,stroke:#01579b,stroke-width:2px;
+    classDef agents fill:#fff9c4,stroke:#fbc02d,stroke-width:2px;
 
-🔹 Market Intelligence Agent
-Evaluates disease prevalence and unmet need (mocked data)
+    User((User Input<br/>Drug + Disease)):::frontend
+    
+    subgraph "FastAPI Backend (The Brain)"
+        Master[Master Agent<br/>LangGraph Supervisor]:::backend
+        Lit[Literature Agent]:::agents
+        Trial[Clinical Agent]:::agents
+        Patent[Patent & Market Agent]:::agents
+        Aggregator{Negative Logic Filter<br/>& Scoring Engine}:::backend
+    end
 
-🔹 Mechanism Explorer Agent
-Performs MoA and pathway-level reasoning
-Ensures biological plausibility before ranking
+    subgraph "Vanilla JS Frontend (The Glass Box)"
+        UI[Clinical Dashboard<br/>Live Steering & Export]:::frontend
+        Graph[D3.js XAI Graph<br/>Clickable Evidence]:::frontend
+        AR[WebXR AR Modal<br/>3D Molecule View]:::frontend
+    end
 
-🔹 GNN Ranking Agent
-Aggregates multi-source signals
-Ranks drug–disease pairs with confidence scores
+    User --> Master
+    Master --> Lit & Trial & Patent
+    Lit & Trial & Patent --> Aggregator
+    Aggregator -- "JSON + SHA-256 Hash" --> UI
+    UI --> Graph
+    UI --> AR
+```
+🛠️ Enterprise-Grade Tech Stack
+Backend (Intelligence Layer)
+Framework: Python, FastAPI, Uvicorn
+Orchestration: LangGraph (Multi-Agent Routing)
+Validation: Pydantic (Request/Response schemas)
+Data Ingestion: PubMed/NCBI Entrez APIs, ClinicalTrials.gov API v2, Local cached raw evidence.
+Security/Audit: hashlib (SHA-256 IP Timestamping)
 
-📊 Visual Outputs
-Discovery Graph: Molecule–Pathway–Disease relationships
-Explainable Evidence Flow: Contribution of each evidence source
-Molecular Impact Heatmap: Pathway component impact per disease
-Opportunity Cards: Ranked indications with confidence scores
+Frontend (Presentation Layer)
+Architecture: Vanilla HTML5, CSS3, JavaScript (No heavy frameworks for maximum performance).
+Typography & Icons: Inter font (Google Fonts), Font Awesome.
+Data Visualization: D3.js (Interactive graph/XAI visualizations).
+Immersive Tech: Google <model-viewer> for WebXR/AR integration.
+Reporting: HTML report generation + jsPDF (UMD build) for clinician-style exportable documents.
 
-🛠️ Tech Stack
-Backend
-Python
-FastAPI
-LangGraph (agent orchestration)
-AI / ML
-LLMs (OpenAI / HuggingFace – planned)
-Graph Neural Networks (PyTorch Geometric – planned)
-Vector Search (FAISS – planned)
-Frontend
-React
-D3.js (interactive graphs)
-React Three Fiber (3D molecule visualization – planned)
-Data
-Public biomedical datasets (mocked initially)
-Internal documents (simulated)
+🚀 Getting Started
+Prerequisites
+Python 3.10+
+A modern web browser (Chrome/Edge/Safari)
 
-Current Status
-⚠️ Prototype Stage
-Architecture designed and validated
-UI wireframes and interaction flows implemented
-Agent responsibilities and workflows defined
-Mock data used for demonstration
+1. Backend Setup
+DOS
+# Clone the repository
+```
+git clone [https://github.com/sanashk19/CuraNova-AI.git](https://github.com/sanashk19/CuraNova-AI.git)
+cd CuraNova-AI/backend
+```
 
-⏳ Code implementation in progress
+# Create and activate virtual environment
+```
+python -m venv venv
+venv\Scripts\activate  # Windows command
+```
 
-🗺️ Step-by-Step Implementation Plan
-Phase 1: Core Infrastructure
-Setup FastAPI backend
-Create API endpoints for analysis requests
-Implement Master Agent using LangGraph
+# Install dependencies
+```
+pip install -r requirements.txt
 
-Phase 2: Agent Development
-Implement Literature, Clinical Trials, and Patent Agents
-Integrate mock data sources
-Define agent communication protocols
+# Start the FastAPI server
+uvicorn main:app --reload
+```
+The API will be live at http://localhost:8000
 
-Phase 3: Explainability Layer
-Build evidence contribution tracking
-Implement Explainable Evidence Flow logic
+2. Frontend Setup
+Because the frontend is built with pure Vanilla HTML/JS, you do not need Node.js or npm!
+Open the frontend/ folder.
+Use a local development server to avoid CORS issues. If you have VS Code, simply right-click index.html (or your main dashboard file) and select "Open with Live Server".
+Alternatively, use Python's built-in server:
+```
+DOS
+cd frontend
+python -m http.server 3000
+```
+The UI will be accessible at http://localhost:3000
 
-Phase 4: Ranking Engine
-Implement GNN-based ranking
-Generate confidence scores
+🧪 Core Workflow & Features
+Drug + Disease Research Query: Enter a drug (e.g., Terazosin) and disease (ALS).
+Modular Agent Analysis: Backend agents asynchronously scrape and parse literature, trials, and patent data.
+Score & Reject: The Aggregator compiles an Overall Repurposing Score, actively catching bad candidates using the Toxicity/Patent gates.
+Interactive Dashboard: View the result, see the rejected alternatives in the "Why Not?" panel, and use sliders to steer the AI's weighting.
+Explore & Validate: Click the AI Knowledge Graph to read the source literature, or click "View in AR" to inspect the .glb protein model.
+Export: Generate a structured, judge-ready clinical HTML/PDF report.
 
-Phase 5: Frontend Integration
-Build interactive graphs and heatmaps
-Connect backend APIs to UI
-Enable report export
+👥 The Team
+CuraNova AI - Building Tomorrow’s Solutions for Today’s India.
+Developed for EY Techathon 6.0.
 
-📈 Impact Metrics
-Reduction in early-stage research time
-Increase in number of hypotheses evaluated
-Improved decision confidence among researchers
-Reduced manual review effort
-
-🔐 Disclaimer
-RepurposeQuest AI is a research decision-support tool and is not intended for clinical diagnosis or treatment decisions. All outputs are designed to assist human experts, not replace them.
-
-👥 Team – CuraNova AI
-Sana Shaikh – Lead, Agentic AI & System Orchestration
-Shriya Bhat – Agentic AI Engineer
-Jiya Haldankar – Frontend & Data Visualization Engineer
-Prathiksha Gajula – Backend & API Engineer
-
-📄 License
-This project is developed as part of EY Techathon 6.0 for academic and innovation purposes.
+# Sana Shaikh - Agentic AI & System Orchestration Lead
+# Shriya Bhat - Data Engineer
+# Prathiksha Gajula - Backend & API Engineer
+# Jiya Haldankar - Frontend Engineer
